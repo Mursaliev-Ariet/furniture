@@ -2,7 +2,6 @@ from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
-from .models import *
 from .serializers import *
 from django.db import transaction
 class CategoryListCreateView(generics.ListCreateAPIView):
@@ -11,12 +10,6 @@ class CategoryListCreateView(generics.ListCreateAPIView):
 class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-class DocumentListCreateView(generics.ListCreateAPIView):
-    queryset = Document.objects.all()
-    serializer_class = DocumentSerializer
-class DocumentDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Document.objects.all()
-    serializer_class = DocumentSerializer
 class FurnitureListCreateView(generics.ListCreateAPIView):
     queryset = Furniture.objects.all()
 
@@ -164,6 +157,3 @@ class ApplicationListCreateView(generics.ListCreateAPIView):
 class ApplicationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
-class ContactMessageCreateView(generics.CreateAPIView):
-    queryset = ContactMessage.objects.all()
-    serializer_class = ContactMessageSerializer

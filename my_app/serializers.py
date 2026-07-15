@@ -13,15 +13,9 @@ class CategorySerializer(serializers.ModelSerializer):
             return CategorySerializer(obj.children.all(), many=True).data
         return []
 
-class DocumentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Document
-        fields = '__all__'
-
 class FurnitureSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     category_id = serializers.IntegerField(source='category.id', read_only=True)
-    documents = DocumentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Furniture
@@ -74,12 +68,6 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
             except Furniture.DoesNotExist:
                 pass
         return value
-
-class ContactMessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ContactMessage
-        fields = '__all__'
-        read_only_fields = ['created_at']
 
 class OrderItemSerializer(serializers.ModelSerializer):
     furniture_name = serializers.CharField(source='furniture.name', read_only=True)

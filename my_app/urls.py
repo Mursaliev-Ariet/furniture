@@ -1,5 +1,4 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 from .views import *
 
 urlpatterns = [
@@ -24,5 +23,4 @@ urlpatterns = [
     path('applications/', ApplicationListCreateView.as_view(), name='applications'),
     path('applications/<int:pk>/', ApplicationDetailView.as_view(), name='application-detail'),
 
-    path('contact/', ContactMessageCreateView.as_view(), name='contact'),
 ]

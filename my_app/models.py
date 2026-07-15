@@ -22,38 +22,6 @@ class Category(models.Model):
         verbose_name_plural = "Категории"
         ordering = ['order']
 
-
-class Document(models.Model):
-    title = models.CharField(max_length=200, verbose_name="Название")
-    number = models.CharField(max_length=50, verbose_name="Номер")
-    description = models.TextField(blank=True, verbose_name="Описание")
-    file = models.FileField(upload_to='documents/', blank=True, null=True, verbose_name="Файл")
-    furniture = models.ForeignKey(
-        'Furniture',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='documents',
-        verbose_name="Товар"
-    )
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='documents',
-        verbose_name="Категория"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Документ"
-        verbose_name_plural = "Документы"
-
-    def __str__(self):
-        return f"{self.title} №{self.number}"
-
-
 class Furniture(models.Model):
     SEASON_CHOICES = [
         ('winter', 'Зима'),
@@ -69,12 +37,12 @@ class Furniture(models.Model):
     )
     name = models.CharField(max_length=200, verbose_name="Название")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
-    material = models.CharField(max_length=100, verbose_name="Материал")  # ткань
+    material = models.CharField(max_length=100, verbose_name="Материал")
     color = models.CharField(max_length=50, verbose_name="Цвет")
     sku = models.CharField(max_length=50, verbose_name="Артикул")
     description = models.TextField(verbose_name="Описание комплектации")
     care_instructions = models.TextField(verbose_name="Рекомендации по уходу")
-    sizes = models.JSONField(default=list, verbose_name="Размеры")  # список строк: ['1,5 сн', '2 сн', ...] или ['40', '42', ...]
+    sizes = models.JSONField(default=list, verbose_name="Размеры")
     season = models.CharField(max_length=10, choices=SEASON_CHOICES, default='all', verbose_name="Сезон")
     is_popular = models.BooleanField(default=False, verbose_name="Популярный")
     is_new = models.BooleanField(default=False, verbose_name="Новинка")
@@ -88,7 +56,6 @@ class Furniture(models.Model):
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
 
-
 class LikedFurniture(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorites')
     furniture = models.ForeignKey(Furniture, on_delete=models.CASCADE)
@@ -99,7 +66,6 @@ class LikedFurniture(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.furniture.name}"
-
 
 class CartItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cart')
@@ -117,22 +83,6 @@ class CartItem(models.Model):
     @property
     def total_price(self):
         return self.furniture.price * self.quantity
-
-
-class ContactMessage(models.Model):
-    name = models.CharField(max_length=100, verbose_name="Имя")
-    phone = models.CharField(max_length=20, verbose_name="Телефон")
-    email = models.EmailField(verbose_name="Email")
-    comment = models.TextField(verbose_name="Комментарий")
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Сообщение контакта"
-        verbose_name_plural = "Сообщения контактов"
-
-    def __str__(self):
-        return f"Сообщение от {self.name}"
-
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -170,7 +120,6 @@ class Order(models.Model):
     def __str__(self):
         return f"Заказ №{self.id} от {self.created_at.strftime('%d.%m.%Y')}"
 
-
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name="Заказ")
     furniture = models.ForeignKey(Furniture, on_delete=models.CASCADE, verbose_name="Товар")
@@ -185,7 +134,6 @@ class OrderItem(models.Model):
     class Meta:
         verbose_name = "Позиция заказа"
         verbose_name_plural = "Позиции заказа"
-
 
 class Application(models.Model):
     name = models.CharField(max_length=100, verbose_name="Имя")

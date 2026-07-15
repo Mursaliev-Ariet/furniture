@@ -22,11 +22,6 @@ class LikedFurnitureAdmin(admin.ModelAdmin):
 class CartItemAdmin(admin.ModelAdmin):
     list_display = ['user', 'furniture', 'quantity']
 
-@admin.register(ContactMessage)
-class ContactMessageAdmin(admin.ModelAdmin):
-    list_display = ['name', 'phone', 'email', 'created_at']
-    readonly_fields = ['created_at']
-
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['contact_name', 'organization', 'phone', 'email', 'city', 'created_at']
