@@ -1,6 +1,8 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from django.shortcuts import get_object_or_404
 from .serializers import *
 from django.db import transaction
@@ -65,28 +67,43 @@ def get_cart(request):
     cart_items = CartItem.objects.filter(user=request.user)
     serializer = CartItemSerializer(cart_items, many=True)
     return Response(serializer.data)
+@swagger_auto_schema(
+    method='post',
+    request_body=CartItemSerializer,
+    responses={
+        201: openapi.Response('Успешно добавлено', schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'status': {'type': 'string'},
+                'quantity': {'type': 'integer'}
+            }
+        )),
+        400: 'Ошибка валидации'
+    }
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def add_to_cart(request):
-    serializer = CartItemCreateSerializer(data=request.data)
-    if serializer.is_valid():
-        furniture = get_object_or_404(Furniture, id=serializer.validated_data['furniture'])
-        quantity = serializer.validated_data['quantity']
-        size = serializer.validated_data.get('size', '')
+    serializer = CartItemSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        cart_item, created = CartItem.objects.get_or_create(
-            user=request.user,
-            furniture=furniture,
-            size=size,
-            defaults={'quantity': quantity}
-        )
-        if not created:
-            cart_item.quantity += quantity
-            cart_item.save()
+    product_id = serializer.validated_data['product_id']
+    quantity = serializer.validated_data['quantity']
 
-        return Response({'status': 'added', 'quantity': cart_item.quantity},
-                       status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    cart_item, created = CartItem.objects.get_or_create(
+        user=request.user,
+        product_id=product_id,
+        defaults={'quantity': quantity}
+    )
+    if not created:
+        cart_item.quantity += quantity
+        cart_item.save()
+
+    return Response(
+        {'status': 'added', 'quantity': cart_item.quantity},
+        status=status.HTTP_201_CREATED
+    )
 @api_view(['PUT'])
 @permission_classes([permissions.IsAuthenticated])
 def update_cart_item(request, item_id):
@@ -120,6 +137,20 @@ def get_orders(request):
     orders = Order.objects.filter(user=request.user)
     serializer = OrderSerializer(orders, many=True)
     return Response(serializer.data)
+@swagger_auto_schema(
+    method='post',
+    request_body=OrderCreateSerializer,
+    responses={
+        201: openapi.Response('Успешно добавлено', schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'status': {'type': 'string'},
+                'order_id': {'type': 'integer'}
+            }
+        )),
+        400: 'Ошибка валидации'
+    }
+)
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def create_order(request):

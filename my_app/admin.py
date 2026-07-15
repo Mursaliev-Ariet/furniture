@@ -20,7 +20,7 @@ class LikedFurnitureAdmin(admin.ModelAdmin):
 
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ['user', 'furniture', 'quantity']
+    list_display = ['user', 'product_id', 'quantity']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):

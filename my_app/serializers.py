@@ -1,6 +1,16 @@
 from rest_framework import serializers
 from .models import *
 
+class CartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['user', 'product_id', 'quantity']
+
+    def validate_quantity(self, value):
+        if value < 1:
+            raise serializers.ValidationError("Количество должно быть не меньше 1")
+        return value
+
 class CategorySerializer(serializers.ModelSerializer):
     children = serializers.SerializerMethodField()
 
@@ -35,15 +45,6 @@ class LikedFurnitureSerializer(serializers.ModelSerializer):
     class Meta:
         model = LikedFurniture
         fields = ['id', 'user', 'furniture']
-        read_only_fields = ['user']
-
-class CartItemSerializer(serializers.ModelSerializer):
-    furniture = FurnitureSerializer(read_only=True)
-    total_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
-
-    class Meta:
-        model = CartItem
-        fields = ['id', 'user', 'furniture', 'quantity', 'size', 'total_price']
         read_only_fields = ['user']
 
 class CartItemCreateSerializer(serializers.ModelSerializer):

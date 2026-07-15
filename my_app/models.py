@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название")
@@ -68,21 +69,16 @@ class LikedFurniture(models.Model):
         return f"{self.user.username} - {self.furniture.name}"
 
 class CartItem(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cart')
-    furniture = models.ForeignKey(Furniture, on_delete=models.CASCADE, related_name='cart_items')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    product_id = models.PositiveIntegerField()
     quantity = models.PositiveIntegerField(default=1)
-    size = models.CharField(max_length=20, blank=True, verbose_name="Выбранный размер")
+    added_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Корзина"
-        verbose_name_plural = "Корзина"
+        unique_together = ('user', 'product_id')
 
     def __str__(self):
-        return f"{self.furniture.name} ({self.size})"
-
-    @property
-    def total_price(self):
-        return self.furniture.price * self.quantity
+        return f"{self.user} – {self.product_id} x {self.quantity}"
 
 class Order(models.Model):
     STATUS_CHOICES = [
